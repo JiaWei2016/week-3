@@ -40,19 +40,25 @@
       normalized_zip = parseInt(split[0]);
       schools[i].ZIPCODE = normalized_zip;
     }
+   _.each(schools, function(num){
+     if (typeof num.ZIPCODE === 'string') {
+       split = num.ZIPCODE.split(' ');
+       normalized_zip = parseInt(split[0]);
+       num.ZIPCODE = normalized_zip;
+   })}
 
     // Check out the use of typeof here — this was not a contrived example.
     // Someone actually messed up the data entry
-    if (typeof schools[i].GRADE_ORG === 'number') {  // if number
-      schools[i].HAS_KINDERGARTEN = schools[i].GRADE_LEVEL < 1;
-      schools[i].HAS_ELEMENTARY = 1 < schools[i].GRADE_LEVEL < 6;
-      schools[i].HAS_MIDDLE_SCHOOL = 5 < schools[i].GRADE_LEVEL < 9;
-      schools[i].HAS_HIGH_SCHOOL = 8 < schools[i].GRADE_LEVEL < 13;
+    if (typeof num.GRADE_ORG === 'number') {  // if number
+      num.HAS_KINDERGARTEN = schools[i].GRADE_LEVEL < 1;
+      num.HAS_ELEMENTARY = 1 < schools[i].GRADE_LEVEL < 6;
+      num.HAS_MIDDLE_SCHOOL = 5 < schools[i].GRADE_LEVEL < 9;
+      num.HAS_HIGH_SCHOOL = 8 < schools[i].GRADE_LEVEL < 13;
     } else {  // otherwise (in case of string)
-      schools[i].HAS_KINDERGARTEN = schools[i].GRADE_LEVEL.toUpperCase().indexOf('K') >= 0;
-      schools[i].HAS_ELEMENTARY = schools[i].GRADE_LEVEL.toUpperCase().indexOf('ELEM') >= 0;
-      schools[i].HAS_MIDDLE_SCHOOL = schools[i].GRADE_LEVEL.toUpperCase().indexOf('MID') >= 0;
-      schools[i].HAS_HIGH_SCHOOL = schools[i].GRADE_LEVEL.toUpperCase().indexOf('HIGH') >= 0;
+      num.HAS_KINDERGARTEN = schools[i].GRADE_LEVEL.toUpperCase().indexOf('K') >= 0;
+      num.HAS_ELEMENTARY = schools[i].GRADE_LEVEL.toUpperCase().indexOf('ELEM') >= 0;
+      num.HAS_MIDDLE_SCHOOL = schools[i].GRADE_LEVEL.toUpperCase().indexOf('MID') >= 0;
+      num.HAS_HIGH_SCHOOL = schools[i].GRADE_LEVEL.toUpperCase().indexOf('HIGH') >= 0;
     }
   }
 
@@ -60,14 +66,14 @@
   var filtered_data = [];
   var filtered_out = [];
   for (var i = 0; i < schools.length - 1; i++) {
-    isOpen = schools[i].ACTIVE.toUpperCase() == 'OPEN';
-    isPublic = (schools[i].TYPE.toUpperCase() !== 'CHARTER' ||
-                schools[i].TYPE.toUpperCase() !== 'PRIVATE');
-    isSchool = (schools[i].HAS_KINDERGARTEN ||
-                schools[i].HAS_ELEMENTARY ||
-                schools[i].HAS_MIDDLE_SCHOOL ||
-                schools[i].HAS_HIGH_SCHOOL);
-    meetsMinimumEnrollment = schools[i].ENROLLMENT > minEnrollment;
+    isOpen = num.ACTIVE.toUpperCase() == 'OPEN';
+    isPublic = (num.TYPE.toUpperCase() !== 'CHARTER' ||
+                num.TYPE.toUpperCase() !== 'PRIVATE');
+    isSchool = (num.HAS_KINDERGARTEN ||
+                num.HAS_ELEMENTARY ||
+                num.HAS_MIDDLE_SCHOOL ||
+                num.HAS_HIGH_SCHOOL);
+    meetsMinimumEnrollment = num.ENROLLMENT > minEnrollment;
     meetsZipCondition = acceptedZipcodes.indexOf(schools[i].ZIPCODE) >= 0;
     filter_condition = (isOpen &&
                         isSchool &&
@@ -75,9 +81,9 @@
                         !meetsZipCondition);
 
     if (filter_condition) {
-      filtered_data.push(schools[i]);
+      filtered_data.push(num);
     } else {
-      filtered_out.push(schools[i]);
+      filtered_out.push(num);
     }
   }
   console.log('Included:', filtered_data.length);
@@ -108,3 +114,28 @@
   }
 
 })();
+
+  _.each(filtered_data, function(filter)){
+
+    isOpen = filter.ACTIVE.toUpperCase() == 'OPEN';
+    isPublic = (filter.TYPE.toUpperCase() !== 'CHARTER' ||
+                filter.TYPE.toUpperCase() !== 'PRIVATE');
+    meetsMinimumEnrollment = filtered_data[i].ENROLLMENT > minEnrollment;
+
+    // Constructing the styling  options for our map
+    if (filter.HAS_HIGH_SCHOOL){
+      color = '#0000FF';
+    } else if (filter.HAS_MIDDLE_SCHOOL) {
+      color = '#00FF00';
+    } else {
+      color = '##FF0000';
+    }
+    // The style options
+    var pathOpts = {'radius': filter.ENROLLMENT / 30,
+                    'fillColor': color};
+    L.circleMarker(filter.Y, filter.X], pathOpts)
+      .bindPopup(filter.FACILNAME_LABEL)
+      .addTo(map);
+    }
+
+    })();

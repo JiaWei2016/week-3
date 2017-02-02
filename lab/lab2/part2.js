@@ -18,3 +18,23 @@ _.each(myArray, function(value, key, list) {
   console.log(value, key, list);
 });
 ===================== */
+// week2 lab1 part2
+_.each(_.range(1, 101), function(i){
+  if (i%3===0&&i%5!=0){console.log("Fizz");}
+  else if (i%5===0&&i%3!=0) {console.log("Buzz");}
+  else if (i%3===0&&i%5===0){console.log("FizzBuzz");}
+  else {console.log(i);}
+})
+
+// week3 lab1
+// Instructions: "Write a function which counts the number of times a value occurs in an array "
+// Example: "countItem(['a', 'b', 'a'], 'a') should return 2"
+var countItem = function(arr,element) {
+  var x=0;
+_.each(arr, function(i){
+  if (i=== element){
+  x++;
+  }})
+  return x;
+}
+console.log('countItem success:', countItem([1, 2, 3, 4, 5, 4, 4], 4) === 3);
